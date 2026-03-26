@@ -1,7 +1,7 @@
 # "Agonia" Card Game  
 This is a cpp terminal based game that is based around a university assignment.  
 It will however be developed independently after all and integrate some very interesting mathematical models that would in theory be able to beat the player most of the time based only on the bot player's data.  
-![Playing_Cards_Image](/main/hand-cards-trump-spades.webp)
+![Playing_Cards_Image](https://github.com/mkartsiotis/card_game/main/cards.jpeg)
 ## Rules of the game:  
 ### Setup:
 Each player is dealt 7 cards, and one card is placed face-up to start the discard pile.
