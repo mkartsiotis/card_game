@@ -36,6 +36,17 @@ The developers of the program have agreed to create the following 4 class entiti
 **Player**:This holds the info about the player and specifically their name, id, accumulative score and of cource the cards that they have in hand.  
 
 
+## Development Schedule:  
+1. Finish UML class diagramms by Friday.  
+2. Get started with code on Saturday.  
+3. Finish basic concept coding before the end of next week.  
+4. Full stack production release after Easter.  
+5. Time permitting mathematical features will be added along the way.  
+6. Then the training of the NN and the gathering of the data.  
+Note that all of these are still conceptual and release times may vary depending on schedule and workload fluctuation.  
+This is not the only ongoing project after all(Assembly - Verilog - TSNE embeddings and vector databases)  
+
+
 ## Future ideas...(bucket list)
 1. Investigate mathematical models that could create a bot.(Markov chains, graph theory even using A*+heuristics!)    
 2. Train a NN on player data and deploy it so that the Bot can mimic human psychological and behavioural characteristics.
