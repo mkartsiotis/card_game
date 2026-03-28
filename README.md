@@ -53,17 +53,17 @@ Based on all the objectives set the following logic was set:
     Else the move is rejected and the player is called to play again.  
 11. Then the next player is called and so on.  
 ***We also need to investigate the following scenarios***  
-*What happens if a player drops a special card(7, 8, 9, ACE)?*
-> At that case the penalty point integer counter of the game engine comes in hand. So if a player drops a 7 that int becomes 2, then with the method check_and_penalize the system asks the next player: Do you have a 7?
+>*What happens if a player drops a special card(7, 8, 9, ACE)?*<
+- At that case the penalty point integer counter of the game engine comes in hand. So if a player drops a 7 that int becomes 2, then with the method check_and_penalize the system asks the next player: Do you have a 7?
 If the player decides to play(say yes) then the system automatically checks their cards, finds if there is a 7 and then if there is executes the move as clarified above.  
-If not then the next player receives the 2 cards(drawn from the pile of the deck), penalty int is set back to 0 and then the player is asked to play.  
-> If the special card is 8 then the simply the counter is not updated at the end of the game loop and thus the same player is asked to play.  
-> Similarly if the last played card is 9 then the index is updated by +2.  
-> If the special card is the ACE then the player needs to decide the next suit. So the player is asked to select the suit and simply the proposed suit is set as a game-engine rule parameter.  
-***There is also another thing that needs to be addressed and that is scoring!***  
-> For scoring each player has an accumulative score parameter. At the end of each round the player cards are counted and based on that score is assigned and updated.  
+If not then the next player receives the 2 cards(drawn from the pile of the deck), penalty int is set back to 0 and then the player is asked to play.
+- If the special card is 8 then the simply the counter is not updated at the end of the game loop and thus the same player is asked to play.  
+- Similarly if the last played card is 9 then the index is updated by +2.  
+- If the special card is the ACE then the player needs to decide the next suit. So the player is asked to select the suit and simply the proposed suit is set as a game-engine rule parameter.  
+>***There is also another thing that needs to be addressed and that is scoring!***<  
+- For scoring each player has an accumulative score parameter. At the end of each round the player cards are counted and based on that score is assigned and updated.  
 It is also evident that this significantly transforms the game over logic.
-***Game over logic***
+>***Game over logic***<
 When does the game end? When the accumulative score one player surpasses the threshold set at the beginning of the game.  
 So we need two functions.  
 A round_over function and a game_over function.  
