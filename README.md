@@ -64,7 +64,7 @@ If not then the next player receives the 2 cards(drawn from the pile of the deck
 - For scoring each player has an accumulative score parameter. At the end of each round the player cards are counted and based on that score is assigned and updated.  
 It is also evident that this significantly transforms the game over logic.
 > ***Game over logic***  
-When does the game end? When the accumulative score one player surpasses the threshold set at the beginning of the game.  
+- When does the game end? When the accumulative score one player surpasses the threshold set at the beginning of the game.  
 So we need two functions.  
 A round_over function and a game_over function.  
 The first will access the players' cards and see if any player has a zero card vector length at the end of each card play.  
