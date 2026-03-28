@@ -36,15 +36,15 @@ The developers of the program have agreed to create the following 4 class entiti
 **Player**:This holds the info about the player and specifically their name, id, accumulative score and the cards that they have in hand.  
 
 ### Card Encoding
-Card encoding will be done via global enumerations and specifically:
-`enum suit
-{
-  Spades, Hearts, Diamonds, Clubs
-};`
-`enum card
-{
-  Ace, 2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K
-};`
+Card encoding will be done via global enumerations and specifically:  
+`enum suit  
+{  
+  Spades, Hearts, Diamonds, Clubs  
+};`  
+`enum card  
+{  
+  Ace, 2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K  
+};`  
 ### Design review and logic explanation
 Based on all the objectives set the following logic was set:  
 #### How the game would proceed
