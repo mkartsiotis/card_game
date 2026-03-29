@@ -89,6 +89,7 @@ A round_over function and a game_over function.
 The first will access the players' cards and see if any player has a zero card vector length at the end of each card play.  
 The second will be activated at the end of each round and check the players' accumulative score. If the score surpasses the threshold then it is GAME OVER.  
 
+[UML_Class_Diagram](https://github.com/mkartsiotis/card_game/blob/main/uml.png)
 ## UML Relationships
 This is arguably the most complicated things since they will determine the projects architecture.  
 The Relationships have been determined based on the following thoughts:  
