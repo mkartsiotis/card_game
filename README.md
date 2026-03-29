@@ -6,9 +6,9 @@ It will however be developed independently after all and integrate some very int
 1. [Rules of the game](#rules-of-the-game)
 2. [Class definitions and design choices](#class-definitions-and-design-choices)
 3. [Card Encoding](#card-encoding)
-4. [Design review and logic explanation](#design-review-and-logic-explanations)
+4. [Design review and logic explanation](#design-review-and-logic-explanation)
 5. [UML Relationships](#uml-relationships)
-6. [Future ideas...(bucket list)](#future-ideas...(bucket-list))
+6. [Future ideas](#future-ideas...)
 
 ## Rules of the game:  
 ### Setup:
@@ -89,7 +89,7 @@ A round_over function and a game_over function.
 The first will access the players' cards and see if any player has a zero card vector length at the end of each card play.  
 The second will be activated at the end of each round and check the players' accumulative score. If the score surpasses the threshold then it is GAME OVER.  
 
-## UML Relationships.
+## UML Relationships
 This is arguably the most complicated things since they will determine the projects architecture.  
 The Relationships have been determined based on the following thoughts:  
 1. The main entity that handles everything is the game engine.  
@@ -116,7 +116,7 @@ Note that all of these are still conceptual and release times may vary depending
 This is not the only ongoing project after all(Assembly - Verilog - TSNE embeddings and vector databases)  
 
 
-## Future ideas...(bucket list)
+## Future ideas...
 1. Investigate mathematical models that could create a bot.(Markov chains, graph theory even using A*+heuristics!)    
 2. Train a NN on player data and deploy it so that the Bot can mimic human psychological and behavioural characteristics.
 3. Make graphics with raylib or a graph library.  
