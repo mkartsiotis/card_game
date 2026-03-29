@@ -2,6 +2,15 @@
 This is a cpp terminal based game that is based around a university assignment.  
 It will however be developed independently after all and integrate some very interesting mathematical models that would in theory be able to beat the player most of the time based only on the bot player's data.  
 ![Playing_Cards_Image](https://github.com/mkartsiotis/card_game/blob/main/cards.jpeg)
+## Contents: 
+[Rules of the game](##rules-of-the-game)
+
+
+
+
+
+
+
 ## Rules of the game:  
 ### Setup:
 Each player is dealt 7 cards, and one card is placed face-up to start the discard pile.
@@ -29,12 +38,15 @@ The player with the lowest total score across rounds wins!
 
 ## IMPLEMENTATION:
 ### Class definitions and design choices
+***Initial Thoughts***  
 The developers of the program have agreed to create the following 4 class entities:   
 **Deck**: The deck is the pile that holds all the shuffled cards that have yet to be drawn by a player.  
 **Card**: The card entity this holds information about a card.  
 **Game engine**:This class does all the heavy lifting! It calls the player to play, checks card validity executes special card actions and keeps track of the game in general(for further info on how the game engine connects to the whole system check the class UML diagramm).  
 **Player**:This holds the info about the player and specifically their name, id, accumulative score and the cards that they have in hand.  
-
+***Refined approach***  
+If you have noticed one thing that would have certainly been the absurd amount of responsibilities of the game-engine class.  
+Thus, that class will be split and the rule verification and scoring will be handled independently by the *Rulebook* and *Scoreboard* classes respectively as seen in the UML diagram.  
 ### Card Encoding
 Card encoding will be done via global enumerations and specifically:  
 `enum suit  
@@ -92,8 +104,7 @@ The same goes for the deck-card relationship.
 The game-engine-card relationship is weaker since the cards do not "live" into the game-engine they are just held there temporarily.  
 3. We need to ask ourselves another question. *Can there be a player without a game-engine?*  
 No! So the relationship of the game-engine and the player is *composition*.
-
-
+4. The rulebook and the scoreboard classes are owned by the game-engine class and cannot exist independently. Therefore, their relationship with the game-engine is composition.  
 
 ## Development Schedule:  
 1. Finish UML class diagrams by Friday.  
