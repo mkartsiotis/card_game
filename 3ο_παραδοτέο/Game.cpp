@@ -172,6 +172,7 @@ Game::Game(Player *p1, Player *p2)
     players = new Player *[noOfPlayers];
     players[0] = p1;
     players[1] = p2;
+    mustPlayAgain = false;
 }
 Game::Game(Player *p1, Player *p2, Player *p3, Player *p4)
 {
@@ -218,28 +219,29 @@ void Game::startRound()
     // 1. Καθαρισμός των χεριών των παικτών (ΜΟΝΟ clear, ΟΧΙ delete!)
     for (int i = 0; i < noOfPlayers; ++i)
     {
+        for (int j = 0; j < players[i]->getHand().numberOfCards(); j++)
+            delete players[i]->getHand().getCards()[j];
         players[i]->getHand().clear(); // Μηδενίζει το μέγεθος του χεριού
         players[i]->setHasDrawnCard(false);
         players[i]->setStatus(HASNTPLAYED); // Επαναφορά κατάστασης παίκτη
     }
 
-    // 2. Καθαρισμός του τραπεζιού (ΜΟΝΟ clear, ΟΧΙ delete!)
+    // 2. Καθαρισμός του τραπεζιού
+    for (int i = 0; i < table.getPileSize(); i++)
+        delete table.getPile()[i];
     table.clearPile(); // Μηδενίζει το μέγεθος του τραπεζιού
 
     // 3. Reset και ανακάτεμα της τράπουλας
-    // Η deck.reset() είναι η ΜΟΝΗ υπεύθυνη να κάνει delete τις παλιές και να φτιάξει 52 νέες κάρτες
     deck.reset();
     deck.shuffle();
 
     // 4. Μοίρασμα 7 νέων καρτών σε κάθε παίκτη
-    for (int i = 0; i < noOfPlayers; ++i)
-    {
-        for (int j = 0; j < 7; ++j)
+    for (int j = 0; j < 7; ++j)
+        for (int i = 0; i < noOfPlayers; ++i)
         {
             players[i]->drawCard(deck.deal());
+            players[i]->setHasDrawnCard(false);
         }
-        players[i]->setHasDrawnCard(false);
-    }
 
     // 5. Άνοιγμα της πρώτης κάρτας του γύρου στο τραπέζι
     Card *startingCard = deck.deal();
@@ -250,9 +252,8 @@ void Game::startRound()
     penaltyStack = 0;
     skipNext = false;
     mustPlayAgain = false;
-    // currentPlayerIndex = 0; // Ξεκινάει πάντα ο πρώτος παίκτης
+    currentPlayerIndex = 0;
 }
-
 void Game::advanceTurn()
 {
     if (mustPlayAgain == true)
@@ -260,18 +261,13 @@ void Game::advanceTurn()
         mustPlayAgain = false;
         return;
     }
-    if (currentPlayerIndex < noOfPlayers - 1)
-    {
-        currentPlayerIndex++;
-    }
-    else
-    {
+    currentPlayerIndex = (currentPlayerIndex + 1) % noOfPlayers;
+    if (currentPlayerIndex == 0)
         for (int i = 0; i < noOfPlayers; i++)
             if (players[i]->getStatus() == PASSED || players[i]->getStatus() == PLAYED ||
                 players[i]->getStatus() == MISSEDTURN)
                 players[i]->setStatus(HASNTPLAYED);
-        currentPlayerIndex = 0;
-    }
+
     if (skipNext == true)
     {
         cout << "\n" << players[currentPlayerIndex]->getName() << "misses their turn!" << endl;
@@ -294,6 +290,7 @@ void Game::replenishDeckIfNeeded(int neededCards)
 
 void Game::applyPenalty(Player *p)
 {
+    replenishDeckIfNeeded(penaltyStack);
     for (int i = 0; i < penaltyStack; i++)
         p->drawCard(deck.deal());
     cout << p->getName() << " absorbs " << penaltyStack << " penalty card(s)!\n";

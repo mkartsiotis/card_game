@@ -47,7 +47,6 @@ int Deck::getCurrentSize() const
 {
     return currentSize;
 }
-
 Deck::Deck() : currentSize(0), capacity(52)
 {
     cards = new Card *[capacity];
@@ -81,26 +80,110 @@ void Deck::reset()
 {
     for (int i = 0; i < 52; i++)
         delete cards[i];
-    delete[] cards;
-    cards = new Card *[capacity];
-    currentSize = 52;
-    for (int i = 0; i < 4; i++)
+    currentSize = 0;
+    CardSuit suits[4] = {HEART, DIAMOND, SPADE, CLUB};
+
+    for (int s = 0; s < 4; ++s)
     {
-        CardSuit currentSuit = static_cast<CardSuit>(i);
-        cards[(i * 13)] = new Ace(currentSuit, 1, 11);
-        for (int k = 2; k <= 6; k++)
-            cards[(i * 13) + (k - 1)] = new Simple(currentSuit, k, k);
-        cards[(i * 13) + 6] = new Seven(currentSuit, 7, 10);
-        cards[(13 * i) + 7] = new Eight(currentSuit, 8, 10);
-        cards[(13 * i) + 8] = new Nine(currentSuit, 9, 10);
-        for (int k = 10; k <= 13; k++)
-            cards[(i * 13) + (k - 1)] = new Simple(currentSuit, k, 10);
+        for (int v = 1; v <= 13; ++v)
+        {
+            int pts = 0;
+            if (v == 1)
+            {
+                pts = 11;
+            }
+            else if (v >= 11 && v <= 13)
+            {
+                pts = 10;
+            }
+            else
+            {
+                pts = v;
+            }
+
+            if (v == 1)
+            {
+                cards[currentSize] = new Ace(suits[s], v, pts);
+            }
+            else if (v == 7)
+            {
+                cards[currentSize] = new Seven(suits[s], v, pts);
+            }
+            else if (v == 8)
+            {
+                cards[currentSize] = new Eight(suits[s], v, pts);
+            }
+            else if (v == 9)
+            {
+                cards[currentSize] = new Nine(suits[s], v, pts);
+            }
+            else
+            {
+                cards[currentSize] = new Simple(suits[s], v, pts);
+            }
+            currentSize++;
+        }
     }
 }
+/*
+void Deck::reset()
+{
+    // Καθαρισμός των υπαρχόντων καρτών
+    for (int i = 0; i < currentSize; ++i)
+    {
+        delete cards[i];
+    }
+    currentSize = 0;
 
+    // Επαναδημιουργία και των 52 καρτών με την ίδια λογική του constructor
+    CardSuit suits[4] = {HEART, DIAMOND, SPADE, CLUB};
+
+    for (int s = 0; s < 4; ++s)
+    {
+        for (int v = 1; v <= 13; ++v)
+        {
+            int pts = 0;
+            if (v == 1)
+            {
+                pts = 11;
+            }
+            else if (v >= 11 && v <= 13)
+            {
+                pts = 10;
+            }
+            else
+            {
+                pts = v;
+            }
+
+            if (v == 1)
+            {
+                cards[currentSize] = new Ace(suits[s], v, pts);
+            }
+            else if (v == 7)
+            {
+                cards[currentSize] = new Seven(suits[s], v, pts);
+            }
+            else if (v == 8)
+            {
+                cards[currentSize] = new Eight(suits[s], v, pts);
+            }
+            else if (v == 9)
+            {
+                cards[currentSize] = new Nine(suits[s], v, pts);
+            }
+            else
+            {
+                cards[currentSize] = new Simple(suits[s], v, pts);
+            }
+            currentSize++;
+        }
+    }
+}
+*/
 Card *Deck::deal()
 {
-    if (this->isEmpty() == true)
+    if (this->currentSize == 0)
         return nullptr;
     else
     {
@@ -114,7 +197,9 @@ Card *Deck::deal()
 void Deck::rebuildFromDiscard(Card **discardPile, int discardSize)
 {
     for (int i = 0; i < discardSize - 1; i++)
-        cards[i] = discardPile[i];
-    this->currentSize = discardSize - 1;
+    {
+        cards[currentSize] = discardPile[i];
+        currentSize++;
+    }
     this->shuffle();
 }
