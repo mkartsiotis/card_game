@@ -61,9 +61,9 @@ Deck::Deck() : currentSize(0), capacity(52)
         cards[(i * 13)] = new Ace(currentSuit, 1, 11);
         for (int k = 2; k <= 6; k++)
             cards[(i * 13) + (k - 1)] = new Simple(currentSuit, k, k);
-        cards[(i * 13) + 6] = new Seven(currentSuit, 7, 10);
-        cards[(13 * i) + 7] = new Eight(currentSuit, 8, 10);
-        cards[(13 * i) + 8] = new Nine(currentSuit, 9, 10);
+        cards[(i * 13) + 6] = new Seven(currentSuit, 7, 7);
+        cards[(13 * i) + 7] = new Eight(currentSuit, 8, 8);
+        cards[(13 * i) + 8] = new Nine(currentSuit, 9, 9);
         for (int k = 10; k <= 13; k++)
             cards[(i * 13) + (k - 1)] = new Simple(currentSuit, k, 10);
     }

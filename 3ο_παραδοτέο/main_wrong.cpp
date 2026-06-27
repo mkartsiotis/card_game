@@ -34,7 +34,9 @@ using namespace std;
 #include "Player.h"
 #include "Table.h"
 Card **getValidCards(Game &g, Player *current, int &validCount);
-void handleChoice(Game &g, Player *current, Card **validCards, int validCount, int choice, bool &turnEnded,
+// void handleChoice(Game &g, Player *current, Card **validCards, int validCount, int choice, bool &turnEnded,
+//                  bool &gameRunning);
+void handleChoice(Game &game, Player *current, Card **valid, int validCount, int choice, bool &turnEnded,
                   bool &gameRunning);
 // ---------------------------------------------------------------------------
 // hasPlayerReachedPointsLimit
@@ -328,7 +330,94 @@ Card **getValidCards(Game &g, Player *current, int &validCount)
         return array_of_v_cards;
     }
 }
+void handleChoice(Game &game, Player *current, Card **valid, int validCount, int choice, bool &turnEnded,
+                  bool &gameRunning)
+{
+    if (choice == -1)
+    {
+        // Αν δεν έχει τραβήξει κάρτα και δεν υπάρχει ποινή
+        if (!current->getHasDrawnCard() && game.getPenaltyStack() == 0)
+        {
+            cout << current->getName() << " draws 1 card(s).\n";
+            game.replenishDeckIfNeeded(1);
+            current->drawCard(game.getDeck().deal());
+        }
+        // Αν δεν έχει τραβήξει κάρτα και υπάρχει ενεργή ποινή
+        else if (!current->getHasDrawnCard() && game.getPenaltyStack() > 0)
+        {
+            game.applyPenalty(current);
+        }
+        // Αν έχει ήδη τραβήξει φύλλο
+        else
+        {
+            cout << current->getName() << " passes.\n";
+            current->pass();
+            turnEnded = true;
+        }
+    }
+    else if (choice >= 0 && choice < validCount)
+    {
+        Card *playedCard = valid[choice];
 
+        // Αφαίρεση της κάρτας από το χέρι
+        if (current->playCard(playedCard))
+        {
+
+            // Μήνυμα απόκρουσης ποινής
+            if (game.getPenaltyStack() > 0 && playedCard->getValue() == 7)
+            {
+                cout << current->getName() << " successfully bounces the penalty with another 7!\n";
+            }
+
+            // Τοποθέτηση κάρτας στο τραπέζι και καθαρισμός δηλωμένης φιγούρας
+            game.getTable().addCard(playedCard);
+            game.getTable().resetDeclaredSuit();
+
+            // Εφαρμογή των effect των ειδικών καρτών
+            CardEffect effect = playedCard->getEffect();
+            if (effect == DRAW_TWO)
+            {
+                cout << current->getName() << " raised the penalty stack!\n";
+                game.addPenaltyStack(2);
+            }
+            else if (effect == PLAY_AGAIN)
+            {
+                cout << current->getName() << " gets to play another card!!\n";
+                game.setMustPlayAgain(true);
+            }
+            else if (effect == SKIP_NEXT)
+            {
+                cout << "Nine played! Next player loses their turn.\n";
+                game.setSkipNext(true);
+            }
+            else if (effect == CHANGE_SUIT)
+            {
+                CardSuit newSuit = current->chooseSuit();
+                game.getTable().setDeclaredSuit(newSuit);
+                cout << current->getName() << " declares suit: " << suitToString(newSuit) << "\n";
+            }
+
+            // Έλεγχος τέλους γύρου (ο παίκτης έμεινε από κάρτες)
+            if (!current->hasCards())
+            {
+                cout << current->getName() << " has no more cards. Round ends!\n";
+                gameRunning = false;
+            }
+
+            turnEnded = true;
+        }
+        else
+        {
+            cout << "Error: Could not play the card. Please try again.\n";
+        }
+    }
+    else
+    {
+        cout << "Invalid choice. Please pick a number from 0 to " << validCount - 1 << " or -1.\n";
+    }
+}
+
+/*
 void handleChoice(Game &g, Player *current, Card **validCards, int validCount, int choice, bool &turnEnded,
                   bool &gameRunning)
 {
@@ -408,3 +497,4 @@ void handleChoice(Game &g, Player *current, Card **validCards, int validCount, i
         cout << "Invalid choice. Please pick a number from 0 to " << validCount - 1 << " or -1.\n";
     }
 }
+*/
