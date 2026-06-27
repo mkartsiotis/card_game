@@ -33,7 +33,9 @@ using namespace std;
 #include "Hand.h"
 #include "Player.h"
 #include "Table.h"
-
+Card **getValidCards(Game &g, Player *current, int &validCount);
+void handleChoice(Game &g, Player *current, Card **validCards, int validCount, int choice, bool &turnEnded,
+                  bool &gameRunning);
 // ---------------------------------------------------------------------------
 // hasPlayerReachedPointsLimit
 // ---------------------------------------------------------------------------
@@ -299,19 +301,27 @@ int main()
     return 0;
 }
 
-Card **getValidCards(Game &g, Card *topCard, int &validCount)
+Card **getValidCards(Game &g, Player *current, int &validCount)
 {
+    validCount = 0; // Πολύ σημαντικό να αρχικοποιείται!
+
     if (g.getPenaltyStack() == 0)
-        return g.getCurrentPlayer()->getHand().validRoundCards(topCard, g.getTable().getHasDeclaredSuit(),
-                                                               g.getTable().getDeclaredSuit(), validCount);
+    {
+        // Ζητάμε την topCard απευθείας από το table
+        return current->getHand().validRoundCards(g.getTable().topCard(), g.getTable().getHasDeclaredSuit(),
+                                                  g.getTable().getDeclaredSuit(), validCount);
+    }
     else
     {
         Card **array_of_v_cards = new Card *[52];
-        for (int i = 0; i < g.getCurrentPlayer()->getHand().numberOfCards(); i++)
+        Card **handCards = current->getHand().getCards();
+        int handSize = current->getHand().numberOfCards();
+
+        for (int i = 0; i < handSize; i++)
         {
-            if (g.getCurrentPlayer()->getHand().getCards()[i]->getValue() == 7)
+            if (handCards[i]->getValue() == 7)
             {
-                array_of_v_cards[i] = g.getCurrentPlayer()->getHand().getCards()[i];
+                array_of_v_cards[validCount] = handCards[i];
                 validCount++;
             }
         }
@@ -319,27 +329,26 @@ Card **getValidCards(Game &g, Card *topCard, int &validCount)
     }
 }
 
-void handleChoice(Game &g, int choice, Card **validCards, int validCount, bool &gameRunning, bool &turnEnded)
+void handleChoice(Game &g, Player *current, Card **validCards, int validCount, int choice, bool &turnEnded,
+                  bool &gameRunning)
 {
-    Player *currentPlayer = g.getCurrentPlayer();
-    string playerName = currentPlayer->getName();
+    string playerName = current->getName();
 
     if (choice == -1)
     {
-        if (!currentPlayer->getHasDrawnCard() && g.getPenaltyStack() == 0)
+        if (!current->getHasDrawnCard() && g.getPenaltyStack() == 0)
         {
             cout << playerName << " draws 1 card(s).\n";
-            currentPlayer->drawCard(g.getDeck().deal());
+            g.replenishDeckIfNeeded(1);
+            current->drawCard(g.getDeck().deal());
         }
-        else if (!currentPlayer->getHasDrawnCard() && g.getPenaltyStack() > 0)
+        else if (!current->getHasDrawnCard() && g.getPenaltyStack() > 0)
         {
-            // Δεν έχει τραβήξει και υπάρχει ποινή -> απορροφά την ποινή
-            g.applyPenalty(currentPlayer);
+            g.applyPenalty(current);
         }
-        else if (currentPlayer->getHasDrawnCard())
+        else if (current->getHasDrawnCard())
         {
-            // Έχει ήδη τραβήξει φύλλο -> πάει πάσο
-            currentPlayer->pass();
+            current->pass();
             turnEnded = true;
             cout << playerName << " passes.\n";
         }
@@ -348,7 +357,7 @@ void handleChoice(Game &g, int choice, Card **validCards, int validCount, bool &
     {
         Card *chosenCard = validCards[choice];
 
-        if (currentPlayer->playCard(chosenCard))
+        if (current->playCard(chosenCard))
         {
             if (g.getPenaltyStack() > 0 && chosenCard->getValue() == 7)
             {
@@ -356,6 +365,7 @@ void handleChoice(Game &g, int choice, Card **validCards, int validCount, bool &
             }
             g.getTable().addCard(chosenCard);
             g.getTable().resetDeclaredSuit();
+
             switch (chosenCard->getEffect())
             {
             case DRAW_TWO:
@@ -371,7 +381,7 @@ void handleChoice(Game &g, int choice, Card **validCards, int validCount, bool &
                 cout << "Nine played! Next player loses their turn.\n";
                 break;
             case CHANGE_SUIT: {
-                CardSuit newSuit = currentPlayer->chooseSuit();
+                CardSuit newSuit = current->chooseSuit();
                 g.getTable().setDeclaredSuit(newSuit);
                 cout << playerName << " declares suit: " << suitToString(newSuit) << "\n";
             }
@@ -380,7 +390,8 @@ void handleChoice(Game &g, int choice, Card **validCards, int validCount, bool &
             default:
                 break;
             }
-            if (currentPlayer->getHand().numberOfCards() == 0)
+
+            if (current->getHand().numberOfCards() == 0)
             {
                 cout << playerName << " has no more cards. Round ends!\n";
                 gameRunning = false;

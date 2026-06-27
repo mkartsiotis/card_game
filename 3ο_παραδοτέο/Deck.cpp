@@ -51,17 +51,23 @@ int Deck::getCurrentSize() const
 Deck::Deck() : currentSize(0), capacity(52)
 {
     cards = new Card *[capacity];
+    for (int i = 0; i < capacity; i++)
+    {
+        cards[i] = nullptr;
+    }
     for (int i = 0; i < 4; i++)
     {
-        cards[(i * 13)] = new Ace((HEART + i), 1, 11);
+        CardSuit currentSuit = static_cast<CardSuit>(i);
+        cards[(i * 13)] = new Ace(currentSuit, 1, 11);
         for (int k = 2; k <= 6; k++)
-            cards[(i * 13) + (k - 1)] = new Simple((HEART + i), k, k);
-        cards[(i * 13) + 6] = new Seven((HEART + i), 7, 10);
-        cards[(13 * i) + 7] = new Eight((HEART + i), 8, 10);
-        cards[(13 * i) + 8] = new Nine((HEART + i), 9, 10);
+            cards[(i * 13) + (k - 1)] = new Simple(currentSuit, k, k);
+        cards[(i * 13) + 6] = new Seven(currentSuit, 7, 10);
+        cards[(13 * i) + 7] = new Eight(currentSuit, 8, 10);
+        cards[(13 * i) + 8] = new Nine(currentSuit, 9, 10);
         for (int k = 10; k <= 13; k++)
-            cards[(i * 13) + (k - 1)] = new Simple((HEART + i), k, 10);
+            cards[(i * 13) + (k - 1)] = new Simple(currentSuit, k, 10);
     }
+    currentSize = 52;
 }
 
 Deck::~Deck()
@@ -77,16 +83,18 @@ void Deck::reset()
         delete cards[i];
     delete[] cards;
     cards = new Card *[capacity];
+    currentSize = 52;
     for (int i = 0; i < 4; i++)
     {
-        cards[(i * 13)] = new Ace((HEART + i), 1, 11);
+        CardSuit currentSuit = static_cast<CardSuit>(i);
+        cards[(i * 13)] = new Ace(currentSuit, 1, 11);
         for (int k = 2; k <= 6; k++)
-            cards[(i * 13) + (k - 1)] = new Simple((HEART + i), k, k);
-        cards[(i * 13) + 6] = new Seven((HEART + i), 7, 10);
-        cards[(13 * i) + 7] = new Eight((HEART + i), 8, 10);
-        cards[(13 * i) + 8] = new Nine((HEART + i), 9, 10);
+            cards[(i * 13) + (k - 1)] = new Simple(currentSuit, k, k);
+        cards[(i * 13) + 6] = new Seven(currentSuit, 7, 10);
+        cards[(13 * i) + 7] = new Eight(currentSuit, 8, 10);
+        cards[(13 * i) + 8] = new Nine(currentSuit, 9, 10);
         for (int k = 10; k <= 13; k++)
-            cards[(i * 13) + (k - 1)] = new Simple((HEART + i), k, 10);
+            cards[(i * 13) + (k - 1)] = new Simple(currentSuit, k, 10);
     }
 }
 
@@ -98,6 +106,8 @@ Card *Deck::deal()
     {
         Card *returnCard = cards[(currentSize - 1)];
         cards[(currentSize - 1)] = nullptr;
+        currentSize--;
+        return returnCard;
     }
 }
 

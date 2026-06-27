@@ -165,6 +165,7 @@ Player *Game::getCurrentPlayer() const
 
 Game::Game(Player *p1, Player *p2)
 {
+    noOfPlayers = 2;
     currentPlayerIndex = 0;
     skipNext = false;
     penaltyStack = 0;
@@ -174,8 +175,10 @@ Game::Game(Player *p1, Player *p2)
 }
 Game::Game(Player *p1, Player *p2, Player *p3, Player *p4)
 {
+    noOfPlayers = 4;
     currentPlayerIndex = 0;
     skipNext = false;
+    mustPlayAgain = false;
     penaltyStack = 0;
     players = new Player *[noOfPlayers];
     players[0] = p1;
@@ -183,7 +186,7 @@ Game::Game(Player *p1, Player *p2, Player *p3, Player *p4)
     players[2] = p3;
     players[3] = p4;
 }
-
+/*
 void Game::startRound()
 {
     for (int i = 0; i < noOfPlayers; i++)
@@ -199,11 +202,55 @@ void Game::startRound()
                 players[i]->drawCard(deck.deal());
 
         table.addCard(deck.deal());
+        table.resetDeclaredSuit();
         penaltyStack = 0;
         skipNext = false;
         mustPlayAgain = false;
         currentPlayerIndex = 0;
     }
+}
+*/
+// ---------------------------------------------------------------------------
+// startRound
+// ---------------------------------------------------------------------------
+void Game::startRound()
+{
+    // 1. Καθαρισμός των χεριών των παικτών (ΜΟΝΟ clear, ΟΧΙ delete!)
+    for (int i = 0; i < noOfPlayers; ++i)
+    {
+        players[i]->getHand().clear(); // Μηδενίζει το μέγεθος του χεριού
+        players[i]->setHasDrawnCard(false);
+        players[i]->setStatus(HASNTPLAYED); // Επαναφορά κατάστασης παίκτη
+    }
+
+    // 2. Καθαρισμός του τραπεζιού (ΜΟΝΟ clear, ΟΧΙ delete!)
+    table.clearPile(); // Μηδενίζει το μέγεθος του τραπεζιού
+
+    // 3. Reset και ανακάτεμα της τράπουλας
+    // Η deck.reset() είναι η ΜΟΝΗ υπεύθυνη να κάνει delete τις παλιές και να φτιάξει 52 νέες κάρτες
+    deck.reset();
+    deck.shuffle();
+
+    // 4. Μοίρασμα 7 νέων καρτών σε κάθε παίκτη
+    for (int i = 0; i < noOfPlayers; ++i)
+    {
+        for (int j = 0; j < 7; ++j)
+        {
+            players[i]->drawCard(deck.deal());
+        }
+        players[i]->setHasDrawnCard(false);
+    }
+
+    // 5. Άνοιγμα της πρώτης κάρτας του γύρου στο τραπέζι
+    Card *startingCard = deck.deal();
+    table.addCard(startingCard);
+    table.resetDeclaredSuit();
+
+    // 6. Επαναφορά των μεταβλητών κατάστασης του παιχνιδιού
+    penaltyStack = 0;
+    skipNext = false;
+    mustPlayAgain = false;
+    // currentPlayerIndex = 0; // Ξεκινάει πάντα ο πρώτος παίκτης
 }
 
 void Game::advanceTurn()
@@ -213,14 +260,6 @@ void Game::advanceTurn()
         mustPlayAgain = false;
         return;
     }
-    if (skipNext == true)
-    {
-        cout << "\n" << players[currentPlayerIndex]->getName() << "misses their turn!" << endl;
-        players[currentPlayerIndex]->setStatus(MISSEDTURN);
-        skipNext = false;
-        this->advanceTurn();
-    }
-
     if (currentPlayerIndex < noOfPlayers - 1)
     {
         currentPlayerIndex++;
@@ -232,6 +271,13 @@ void Game::advanceTurn()
                 players[i]->getStatus() == MISSEDTURN)
                 players[i]->setStatus(HASNTPLAYED);
         currentPlayerIndex = 0;
+    }
+    if (skipNext == true)
+    {
+        cout << "\n" << players[currentPlayerIndex]->getName() << "misses their turn!" << endl;
+        players[currentPlayerIndex]->setStatus(MISSEDTURN);
+        skipNext = false;
+        advanceTurn();
     }
 }
 
